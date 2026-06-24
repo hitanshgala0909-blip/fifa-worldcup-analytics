@@ -1,6 +1,6 @@
-# [Project name]
+# WC 2026 Intelligence Platform
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+ML-powered Streamlit analytics platform for FIFA World Cup 2026 — match predictions, tournament simulation, player analytics, and fantasy recommendations.
 
 ## Run & Operate
 
