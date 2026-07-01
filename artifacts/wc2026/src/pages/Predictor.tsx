@@ -225,7 +225,7 @@ export default function Predictor() {
                 </div>
                 {[
                   {l:'ELO Rating', v:homeTeam.eloRating, cmp:awayTeam.eloRating},
-                  {l:'World Rank',  v:`#${homeTeam.worldRank}`, cmp:null},
+                  {l:'Model Rank',  v:`#${homeTeam.worldRank}`, cmp:null},
                   {l:'Group',      v:`Group ${homeTeam.group}`, cmp:null},
                   {l:'Win Prob',   v:`${Math.round(pHome*100)}%`, cmp:null},
                   {l:'QF odds',    v:odds.homeQF, cmp:null},
@@ -244,7 +244,7 @@ export default function Predictor() {
                 </div>
                 {[
                   {l:'ELO Rating', v:awayTeam.eloRating, cmp:homeTeam.eloRating},
-                  {l:'World Rank',  v:`#${awayTeam.worldRank}`, cmp:null},
+                  {l:'Model Rank',  v:`#${awayTeam.worldRank}`, cmp:null},
                   {l:'Group',      v:`Group ${awayTeam.group}`, cmp:null},
                   {l:'Win Prob',   v:`${Math.round(pAway*100)}%`, cmp:null},
                   {l:'QF odds',    v:odds.awayQF, cmp:null},
