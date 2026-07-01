@@ -1,0 +1,35 @@
+Here's your prompt. Copy and paste it exactly:
+
+---
+
+**The FIFA World Cup 2026 is currently live. This platform was built as a pre-tournament ML prediction system, so the player stats and projections reflect model forecasts made before the tournament started — not live match data. I need several urgent fixes:**
+
+**1. Add a disclaimer banner**
+Add a sticky banner directly below the navbar on every page that says:
+"⚡ Pre-tournament ML projections — WC 2026 is now live. Stats shown are model forecasts, not real-time match data. Actual results may differ."
+Style it in amber/gold on a dark background, with a small X button to dismiss it. Store the dismissed state in localStorage so it doesn't reappear after the user closes it.
+
+**2. Fix the page title and meta description**
+The site currently shows a default Replit description. Update the root layout metadata to:
+- Title: "WC 2026 Intelligence Platform"
+- Description: "ML-powered FIFA World Cup 2026 predictions — match forecasts, player analytics, and tournament simulation."
+
+**3. Add a "Projection vs Reality" note on the Players page**
+On the Player Analytics page, above the rankings table, add a small info box explaining: "Tournament projection scores were generated before the tournament began using historical data, ELO ratings, squad strength, and form. They represent what the model expected — not current match statistics."
+
+**4. Add eliminated team badges**
+The following teams have already been eliminated from the 2026 World Cup:
+- Eliminated in group stage: South Africa, Czechia, Qatar, Bosnia and Herzegovina, Scotland, Haiti, Turkey, Paraguay (group), Curaçao, Tunisia, Iran, New Zealand, Algeria (group), Jordan, Uzbekistan, Ghana, Panama, Cabo Verde (if applicable)
+- Eliminated in Round of 32: Germany (lost on penalties to Paraguay), Netherlands (lost on penalties to Morocco), Japan, South Africa (R32), and others still being determined
+
+On the Team Analytics page and Tournament Simulator page, show a small grey "Eliminated" badge next to any team that is already out of the tournament. Use a hardcoded list of eliminated teams for now — I will update this list manually as the tournament progresses.
+
+**5. Update Messi's projected goals on the player card**
+On the player detail/search result for Lionel Messi, add a note beneath his projection score: "Note: Messi has scored 6 goals in the 2026 World Cup group stage (model projected 2). He is now the all-time leading scorer in men's World Cup history with 19 career tournament goals."
+Do this as a hardcoded special case for now.
+
+**Do not change any ML model logic, prediction algorithms, or backend API code. Only change frontend display, labels, banners, and badges.**
+
+---
+
+That's it. Keep it focused — Replit works best when the prompt is specific about what to change and explicit about what NOT to touch.

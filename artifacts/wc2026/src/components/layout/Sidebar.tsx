@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
-import { LayoutDashboard, Trophy, Users, User, Star, Brain, Grid3X3, Globe, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Trophy, Users, User, Star, Brain, Grid3X3, Globe, ChevronLeft, ChevronRight, Swords } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { path: "/players",    label: "Players",      icon: User },
   { path: "/fantasy",    label: "Fantasy",      icon: Star },
   { path: "/intelligence", label: "Intelligence", icon: Brain },
+  { path: "/predictor",  label: "Predictor",    icon: Swords },
 ];
 
 export function Sidebar() {

@@ -86,7 +86,17 @@ export default function Players() {
         </div>
       </div>
 
-      <div style={{maxWidth:1200,margin:'0 auto',padding:'1.5rem 2rem',display:'flex',gap:'1.25rem',alignItems:'flex-start'}}>
+      <div style={{maxWidth:1200,margin:'0 auto',padding:'1.25rem 2rem 0'}}>
+        <div style={{padding:'0.65rem 1rem',background:'#0d1f2d',border:'1px solid #1d4ed830',borderRadius:8,fontSize:12,color:'#93c5fd',display:'flex',gap:'0.6rem',alignItems:'flex-start',marginBottom:'1rem'}}>
+          <span style={{flexShrink:0,marginTop:1}}>ℹ️</span>
+          <span>
+            <strong style={{color:'#bfdbfe'}}>Projection scores</strong> were generated before the tournament began using historical data, ELO ratings, squad strength, and form.
+            They represent what the model <em>expected</em> — not current match statistics. Actual WC 2026 performance may differ significantly.
+          </span>
+        </div>
+      </div>
+
+      <div style={{maxWidth:1200,margin:'0 auto',padding:'0 2rem 1.5rem',display:'flex',gap:'1.25rem',alignItems:'flex-start'}}>
         {/* Player list */}
         <div style={{flex:1,minWidth:0}}>
           <div style={{fontSize:12,color:C.muted,marginBottom:'0.75rem'}}>{filtered.length} players · showing {Math.min(paged.length, filtered.length)}</div>
@@ -178,6 +188,16 @@ export default function Players() {
                       <div style={{width:`${selected.rating*10}%`,height:'100%',background:selected.rating>=9?C.gold:selected.rating>=8?C.green:C.blue,borderRadius:99}} />
                     </div>
                   </div>
+
+                  {/* Messi special case */}
+                  {selected.name === 'Lionel Messi' && (
+                    <div style={{marginBottom:'1rem',padding:'0.65rem 0.75rem',background:'#1a0f00',border:'1px solid #f59e0b50',borderRadius:6}}>
+                      <div style={{fontSize:10,color:C.gold,fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:'0.3rem'}}>⚽ Live Tournament Note</div>
+                      <div style={{fontSize:12,color:'#fde68a',lineHeight:1.5}}>
+                        Messi has scored <strong>6 goals</strong> in the 2026 World Cup group stage (model projected 2). He is now the <strong>all-time leading scorer</strong> in men's World Cup history with <strong>19 career tournament goals</strong>.
+                      </div>
+                    </div>
+                  )}
 
                   {/* Fantasy rec */}
                   <div style={{marginBottom:'1rem',padding:'0.6rem 0.75rem',background:`${C.orange}08`,border:`1px solid ${C.orange}20`,borderRadius:6}}>

@@ -5,6 +5,19 @@ import { Search, X, ChevronUp, ChevronDown } from "lucide-react";
 
 const C = { gold:'#F4C430', green:'#3fb950', blue:'#58a6ff', red:'#f85149', orange:'#f97316', bg:'#0d1117', surface:'#161b22', border:'#30363d', text:'#e6edf3', muted:'#8b949e' };
 
+const ELIMINATED_GROUP: Set<string> = new Set([
+  'South Africa','Czechia','Qatar','Bosnia & Herz.','Scotland','Haiti','Türkiye',
+  'Curaçao','Tunisia','New Zealand','Algeria','Jordan','Uzbekistan','Ghana','Panama','Cape Verde',
+]);
+const ELIMINATED_R32: Set<string> = new Set([
+  'Germany','Netherlands','Japan',
+]);
+function eliminatedBadge(name:string):{show:boolean;label:string;color:string;bg:string}|null {
+  if(ELIMINATED_R32.has(name)) return {show:true,label:'Out R32',color:'#9ca3af',bg:'#9ca3af18'};
+  if(ELIMINATED_GROUP.has(name)) return {show:true,label:'Eliminated',color:'#6b7280',bg:'#6b728018'};
+  return null;
+}
+
 function tier(elo:number):{label:string;color:string;bg:string} {
   if(elo>=1950) return {label:'⚡ Elite',color:C.gold,bg:`${C.gold}18`};
   if(elo>=1850) return {label:'🔵 Contender',color:C.blue,bg:`${C.blue}18`};
@@ -91,9 +104,12 @@ export default function Teams() {
                 style={{display:'grid',gridTemplateColumns:'36px 1fr 60px 60px 80px 90px 80px',gap:'0.5rem',alignItems:'center',padding:'0.55rem 0.75rem',borderBottom:`1px solid ${C.border}20`,cursor:'pointer',background:isSelected?`${C.gold}08`:'transparent',transition:'background 0.1s'}}>
                 <span style={{fontSize:12,color:C.muted,fontWeight:600}}>{i+1}</span>
                 <div style={{display:'flex',alignItems:'center',gap:'0.5rem',minWidth:0}}>
-                  <span style={{fontSize:20,flexShrink:0}}>{t.flagEmoji}</span>
+                  <span style={{fontSize:20,flexShrink:0,opacity:eliminatedBadge(t.name)?0.5:1}}>{t.flagEmoji}</span>
                   <div style={{minWidth:0}}>
-                    <div style={{fontSize:13,fontWeight:600,color:C.text,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{t.name}</div>
+                    <div style={{display:'flex',alignItems:'center',gap:'0.4rem',flexWrap:'wrap'}}>
+                      <span style={{fontSize:13,fontWeight:600,color:eliminatedBadge(t.name)?C.muted:C.text,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',textDecoration:eliminatedBadge(t.name)?'line-through':undefined}}>{t.name}</span>
+                      {(()=>{const b=eliminatedBadge(t.name);return b?<span style={{fontSize:9,background:b.bg,color:b.color,padding:'1px 5px',borderRadius:3,fontWeight:600,flexShrink:0,whiteSpace:'nowrap'}}>{b.label}</span>:null})()}
+                    </div>
                     <div style={{fontSize:10,color:C.muted}}>Grp {t.group} · {t.confederation}</div>
                   </div>
                 </div>

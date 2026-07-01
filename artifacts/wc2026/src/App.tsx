@@ -10,6 +10,7 @@ import Players from "@/pages/Players";
 import Fantasy from "@/pages/Fantasy";
 import Intelligence from "@/pages/Intelligence";
 import Groups from "@/pages/Groups";
+import Predictor from "@/pages/Predictor";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -20,11 +21,12 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/bracket" component={Bracket} />
+        <Route path="/groups" component={Groups} />
         <Route path="/teams" component={Teams} />
         <Route path="/players" component={Players} />
         <Route path="/fantasy" component={Fantasy} />
         <Route path="/intelligence" component={Intelligence} />
-        <Route path="/groups" component={Groups} />
+        <Route path="/predictor" component={Predictor} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
