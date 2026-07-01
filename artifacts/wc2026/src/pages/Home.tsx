@@ -1,338 +1,197 @@
-import { useState, useMemo } from "react";
-import { TEAMS, MATCHES, SIMULATION, TOP_SCORERS, GROUPS, getTeamsByGroup, PLAYERS } from "@/data/wc2026";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Trophy, Calendar, TrendingUp, Zap, Globe2, Activity, Target, Flame } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { TEAMS, SIMULATION } from "@/data/wc2026";
+import { Trophy, Users, Database, BarChart3, Zap, Target, Brain, Grid3X3, TrendingUp, AlertTriangle } from "lucide-react";
 
-const GOLD = "#F0B429";
+const C = { gold:'#F4C430', green:'#3fb950', blue:'#58a6ff', red:'#f85149', orange:'#f97316', bg:'#0d1117', surface:'#161b22', border:'#30363d', text:'#e6edf3', muted:'#8b949e' };
 
-function computeStandings(group: string) {
-  const groupMatches = MATCHES.filter(m => m.group === group && m.homeGoals !== null);
-  const groupTeams = TEAMS.filter(t => t.group === group);
-  const table: Record<string, { pts: number; w: number; d: number; l: number; gf: number; ga: number }> = {};
-  for (const t of groupTeams) table[t.id] = { pts: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
-  for (const m of groupMatches) {
-    const hg = m.homeGoals!, ag = m.awayGoals!;
-    if (!(m.home in table)) table[m.home] = { pts: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
-    if (!(m.away in table)) table[m.away] = { pts: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
-    table[m.home].gf += hg; table[m.home].ga += ag;
-    table[m.away].gf += ag; table[m.away].ga += hg;
-    if (hg > ag) { table[m.home].pts += 3; table[m.home].w++; table[m.away].l++; }
-    else if (hg === ag) { table[m.home].pts += 1; table[m.home].d++; table[m.away].pts += 1; table[m.away].d++; }
-    else { table[m.away].pts += 3; table[m.away].w++; table[m.home].l++; }
-  }
-  return groupTeams
-    .map(t => ({ ...t, ...table[t.id], gd: table[t.id].gf - table[t.id].ga, played: table[t.id].w + table[t.id].d + table[t.id].l }))
-    .sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf);
-}
+const AWARDS = [
+  { title:'Golden Boot', icon:'⚽', player:'Marcus Thuram', team:'France', flag:'🇫🇷', stat:'8.2 xG', sub:'Expected WC Goals', color:C.gold },
+  { title:'Golden Ball', icon:'🏆', player:'Kylian Mbappé', team:'France', flag:'🇫🇷', stat:'97.4', sub:'Overall Index', color:C.gold },
+  { title:'Golden Glove', icon:'🧤', player:'Mike Maignan', team:'France', flag:'🇫🇷', stat:'62%', sub:'Clean Sheet Prob', color:C.blue },
+  { title:'Best Young Player', icon:'⭐', player:'Lamine Yamal', team:'Spain', flag:'🇪🇸', stat:'18 yrs', sub:'Breakout Score 94.1', color:C.green },
+];
 
-function StatPill({ icon: Icon, label, value, sub }: { icon: React.ElementType; label: string; value: string; sub?: string }) {
-  return (
-    <motion.div whileHover={{ scale: 1.03 }} transition={{ duration: 0.15 }}>
-      <Card className="border-border/60">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-4 h-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground tracking-widest uppercase font-medium">{label}</p>
-              <p className="text-xl font-display font-bold text-foreground leading-tight">{value}</p>
-              {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-}
+const DARK_HORSES = [
+  { team:'Japan', flag:'🇯🇵', qfPct:26, r16Pct:66, reason:'Elite defensive organization + clinical counter-attack' },
+  { team:'Ecuador', flag:'🇪🇨', qfPct:27, r16Pct:65, reason:'Hincapié & Caicedo dominant in midfield; underrated xG' },
+  { team:'Morocco', flag:'🇲🇦', qfPct:26, r16Pct:72, reason:'QF pedigree from 2022; Hakimi world-class on right flank' },
+  { team:'Senegal', flag:'🇸🇳', qfPct:18, r16Pct:58, reason:'Mané + Jackson = explosive front two; Mendy elite in goal' },
+];
 
-const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.06 } } };
-const itemVariants = { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } };
+const QUICK_NAV = [
+  { href:'/bracket',     icon:Trophy,    label:'Bracket',      sub:'R32 predictions & live odds', color:C.gold },
+  { href:'/groups',      icon:Grid3X3,   label:'Groups',       sub:'All 12 groups & standings',   color:C.blue },
+  { href:'/teams',       icon:Users,     label:'Teams',        sub:'Power rankings, all 48 teams', color:C.green },
+  { href:'/players',     icon:Database,  label:'Players',      sub:'1,248 players, xG, projections', color:C.orange },
+  { href:'/fantasy',     icon:Trophy,    label:'Fantasy',      sub:'Best XI, captains, differentials', color:'#a855f7' },
+  { href:'/intelligence',icon:Brain,     label:'Intelligence', sub:'Breakout & underrated picks',  color:C.red },
+];
+
+const fade = { hidden:{opacity:0,y:16}, visible:(i:number)=>({opacity:1,y:0,transition:{delay:i*0.06}}) };
 
 export default function Home() {
-  const [activeGroup, setActiveGroup] = useState("A");
-
-  const playedMatches = MATCHES.filter(m => m.homeGoals !== null);
-  const totalGoals = playedMatches.reduce((s, m) => s + (m.homeGoals ?? 0) + (m.awayGoals ?? 0), 0);
-  const avgGoals = playedMatches.length > 0 ? (totalGoals / playedMatches.length).toFixed(2) : "0";
-  const upcomingMatches = MATCHES.filter(m => m.homeGoals === null);
-
-  const standings = useMemo(() => computeStandings(activeGroup), [activeGroup]);
-  const top8Sim = SIMULATION.slice(0, 8);
-  const maxWinPct = Math.max(...top8Sim.map(s => s.winPct));
-
-  // Goals by team for bar chart (top 10 teams by total goals from players)
-  const goalsByTeam = useMemo(() => {
-    const map: Record<string, { goals: number; flag: string }> = {};
-    for (const p of PLAYERS) {
-      if (p.goals > 0) {
-        const team = TEAMS.find(t => t.name === p.country);
-        if (!team) continue;
-        if (!map[team.name]) map[team.name] = { goals: 0, flag: team.flagEmoji };
-        map[team.name].goals += p.goals;
-      }
-    }
-    return Object.entries(map)
-      .map(([name, { goals, flag }]) => ({ name: `${flag} ${name.split(' ')[0]}`, goals }))
-      .sort((a, b) => b.goals - a.goals)
-      .slice(0, 10);
-  }, []);
+  const top5 = SIMULATION.slice(0,5);
+  const champion = TEAMS.find(t => t.id === 'ARG')!;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="font-display text-3xl font-bold text-foreground tracking-wider">Dashboard</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Your live command centre for FIFA World Cup 2026 — standings, contenders, scorers, and fixtures updated in real time.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="border-primary/50 text-primary px-3 py-1 text-xs tracking-widest">
-            <Activity className="w-3 h-3 mr-1.5 animate-pulse" />
-            GROUP STAGE LIVE
-          </Badge>
+    <div style={{background:C.bg,minHeight:'100vh',color:C.text,fontFamily:'Inter,system-ui,sans-serif'}}>
+      {/* Hero Banner */}
+      <div style={{background:`linear-gradient(135deg,#0d1117 0%,#1a1f2e 50%,#0d1117 100%)`,borderBottom:`1px solid ${C.border}`,padding:'2rem 2rem 1.5rem'}}>
+        <div style={{maxWidth:1200,margin:'0 auto'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.5rem'}}>
+            <span style={{background:C.red,color:'white',fontSize:11,fontWeight:700,padding:'2px 8px',borderRadius:4,letterSpacing:1,animation:'pulse 2s infinite'}}>● LIVE</span>
+            <span style={{color:C.muted,fontSize:13}}>GROUP STAGE UNDERWAY — June/July 2026</span>
+            <span style={{marginLeft:'auto',color:C.muted,fontSize:12}}>Updated: {new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>
+          </div>
+          <h1 style={{fontSize:'clamp(24px,4vw,42px)',fontWeight:800,margin:'0 0 0.25rem',letterSpacing:'-0.5px'}}>
+            WC 2026 <span style={{color:C.gold}}>Intelligence</span>
+          </h1>
+          <p style={{color:C.muted,fontSize:14,margin:0}}>ML-powered analytics · 10,000 Monte Carlo simulations · 1,248 players ranked</p>
         </div>
       </div>
 
-      {/* Key Stats */}
-      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <motion.div variants={itemVariants}><StatPill icon={Globe2} label="Teams" value="48" sub="Across 12 groups" /></motion.div>
-        <motion.div variants={itemVariants}><StatPill icon={Target} label="Goals Scored" value={String(totalGoals)} sub={`${avgGoals} per game`} /></motion.div>
-        <motion.div variants={itemVariants}><StatPill icon={Calendar} label="Matches Played" value={String(playedMatches.length)} sub={`${upcomingMatches.length} remaining`} /></motion.div>
-        <motion.div variants={itemVariants}><StatPill icon={Zap} label="Top Scorer" value="Mbappé" sub="8 goals — France" /></motion.div>
-      </motion.div>
+      <div style={{maxWidth:1200,margin:'0 auto',padding:'1.5rem 2rem'}}>
 
-      {/* Group Standings + Golden Boot Race */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Group Standings */}
-        <motion.div variants={itemVariants} initial="hidden" animate="visible" className="lg:col-span-2">
-          <Card className="border-border/60 h-full">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <CardTitle className="font-display text-base tracking-widest flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-primary" />
-                  Group Standings
-                </CardTitle>
-                <div className="flex flex-wrap gap-1">
-                  {GROUPS.map(g => (
-                    <button
-                      key={g}
-                      onClick={() => setActiveGroup(g)}
-                      className={`w-7 h-7 rounded text-xs font-bold font-display transition-colors ${activeGroup === g ? 'bg-primary text-background' : 'bg-muted/40 text-muted-foreground hover:bg-muted/70'}`}
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
+        {/* Quick Stats */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.75rem',marginBottom:'1.5rem'}}>
+          {[
+            {icon:Users,label:'Teams',value:'48',color:C.blue},
+            {icon:Database,label:'Players',value:'1,248',color:C.green},
+            {icon:BarChart3,label:'Simulations',value:'10K',color:C.gold},
+            {icon:Target,label:'Matches Predicted',value:'72',color:C.orange},
+          ].map(({icon:Icon,label,value,color},i)=>(
+            <motion.div key={label} custom={i} variants={fade} initial="hidden" animate="visible" style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:10,padding:'1rem 1.25rem',display:'flex',alignItems:'center',gap:'0.75rem'}}>
+              <div style={{width:36,height:36,borderRadius:8,background:`${color}18`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <Icon size={16} color={color} />
               </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="border-b border-border/50">
-                    <th className="text-left px-4 py-2 text-muted-foreground font-medium tracking-wider">TEAM</th>
-                    <th className="text-center px-2 py-2 text-muted-foreground font-medium">P</th>
-                    <th className="text-center px-2 py-2 text-muted-foreground font-medium">W</th>
-                    <th className="text-center px-2 py-2 text-muted-foreground font-medium">D</th>
-                    <th className="text-center px-2 py-2 text-muted-foreground font-medium">L</th>
-                    <th className="text-center px-2 py-2 text-muted-foreground font-medium">GD</th>
-                    <th className="text-center px-2 py-2 text-muted-foreground font-medium">GF</th>
-                    <th className="text-center px-3 py-2 text-primary font-bold">PTS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {standings.map((team, i) => (
-                    <motion.tr
-                      key={team.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.06 }}
-                      className={`border-b border-border/30 hover:bg-muted/30 transition-colors ${i < 2 ? 'bg-primary/3' : ''}`}
-                    >
-                      <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className={`w-1.5 h-5 rounded-full ${i < 2 ? 'bg-primary' : 'bg-transparent'}`} />
-                          <span className={`text-[10px] font-bold w-4 ${i === 0 ? 'text-primary' : 'text-muted-foreground'}`}>{i + 1}</span>
-                          <span className="text-base">{team.flagEmoji}</span>
-                          <span className="font-medium text-foreground">{team.name}</span>
-                        </div>
-                      </td>
-                      <td className="text-center px-2 py-2.5 text-muted-foreground">{team.played}</td>
-                      <td className="text-center px-2 py-2.5 text-muted-foreground">{team.w}</td>
-                      <td className="text-center px-2 py-2.5 text-muted-foreground">{team.d}</td>
-                      <td className="text-center px-2 py-2.5 text-muted-foreground">{team.l}</td>
-                      <td className={`text-center px-2 py-2.5 font-medium ${team.gd > 0 ? 'text-emerald-400' : team.gd < 0 ? 'text-red-400' : 'text-muted-foreground'}`}>
-                        {team.gd > 0 ? `+${team.gd}` : team.gd}
-                      </td>
-                      <td className="text-center px-2 py-2.5 text-muted-foreground">{team.gf}</td>
-                      <td className="text-center px-3 py-2.5 font-display font-bold text-primary text-sm">{team.pts}</td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="text-[10px] text-muted-foreground px-4 py-2">🟡 Top 2 advance to Round of 32</p>
-            </CardContent>
-          </Card>
-        </motion.div>
+              <div>
+                <div style={{fontSize:11,color:C.muted,textTransform:'uppercase',letterSpacing:1,fontWeight:600}}>{label}</div>
+                <div style={{fontSize:22,fontWeight:800,color:C.text,lineHeight:1.2}}>{value}</div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
-        {/* Golden Boot Race */}
-        <motion.div variants={itemVariants} initial="hidden" animate="visible">
-          <Card className="border-border/60 h-full">
-            <CardHeader className="pb-3">
-              <CardTitle className="font-display text-base tracking-widest flex items-center gap-2">
-                <Flame className="w-4 h-4 text-primary" />
-                Golden Boot Race
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {TOP_SCORERS.slice(0, 8).map((s, i) => (
-                <div key={s.playerName} className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] font-bold w-4 ${i === 0 ? 'text-primary' : 'text-muted-foreground'}`}>{i + 1}</span>
-                    <span className="text-sm">{s.flag}</span>
-                    <span className="text-xs font-medium text-foreground flex-1 truncate">{s.playerName}</span>
-                    <span className="text-sm font-bold text-primary font-display">{s.goals}</span>
+        {/* Champion Prediction + Top 5 */}
+        <div style={{display:'grid',gridTemplateColumns:'340px 1fr',gap:'1rem',marginBottom:'1.5rem',alignItems:'start'}}>
+          {/* Champion Card */}
+          <motion.div initial={{opacity:0,scale:0.97}} animate={{opacity:1,scale:1}} transition={{delay:0.2}} style={{background:`linear-gradient(135deg,${C.surface},#1e2a1e)`,border:`1px solid ${C.gold}40`,borderRadius:12,padding:'1.5rem',textAlign:'center',position:'relative',overflow:'hidden'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`}} />
+            <div style={{fontSize:11,color:C.gold,fontWeight:700,letterSpacing:2,textTransform:'uppercase',marginBottom:'0.5rem'}}>🏆 Predicted Champion</div>
+            <div style={{fontSize:64,marginBottom:'0.5rem'}}>🇦🇷</div>
+            <div style={{fontSize:24,fontWeight:800,marginBottom:'0.25rem'}}>Argentina</div>
+            <div style={{fontSize:13,color:C.muted,marginBottom:'1rem'}}>2022 World Champions · Group J</div>
+            <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}40`,borderRadius:8,padding:'0.75rem'}}>
+              <div style={{fontSize:32,fontWeight:800,color:C.gold}}>14.1%</div>
+              <div style={{fontSize:12,color:C.muted}}>Win Probability</div>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginTop:'0.75rem'}}>
+              <div style={{background:'#ffffff08',borderRadius:6,padding:'0.4rem'}}>
+                <div style={{fontSize:16,fontWeight:700,color:C.text}}>94%</div>
+                <div style={{fontSize:10,color:C.muted}}>R16</div>
+              </div>
+              <div style={{background:'#ffffff08',borderRadius:6,padding:'0.4rem'}}>
+                <div style={{fontSize:16,fontWeight:700,color:C.text}}>72%</div>
+                <div style={{fontSize:10,color:C.muted}}>QF</div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Top 5 Win Probability */}
+          <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:12,padding:'1.25rem'}}>
+            <div style={{fontSize:13,fontWeight:700,color:C.muted,textTransform:'uppercase',letterSpacing:1,marginBottom:'1rem'}}>🎯 Top Win Probabilities</div>
+            {top5.map((s,i)=>(
+              <motion.div key={s.team} custom={i+4} variants={fade} initial="hidden" animate="visible" style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.6rem 0',borderBottom:i<4?`1px solid ${C.border}40`:'none'}}>
+                <div style={{width:24,height:24,borderRadius:'50%',background:`${C.gold}18`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,color:C.gold,flexShrink:0}}>{i+1}</div>
+                <span style={{fontSize:20}}>{s.flag}</span>
+                <div style={{flex:1}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.2rem'}}>
+                    <span style={{fontSize:14,fontWeight:600}}>{s.team}</span>
+                    <span style={{fontSize:14,fontWeight:700,color:C.gold}}>{s.winPct}%</span>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden ml-6">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(s.goals / TOP_SCORERS[0].goals) * 100}%` }}
-                      transition={{ duration: 0.8, delay: i * 0.08, ease: "easeOut" }}
-                      className="h-full rounded-full"
-                      style={{ background: i === 0 ? GOLD : i < 3 ? '#60a5fa' : 'hsl(220 25% 35%)' }}
-                    />
+                  <div style={{height:5,background:'#ffffff12',borderRadius:99,overflow:'hidden'}}>
+                    <motion.div initial={{width:0}} animate={{width:`${(s.winPct/16)*100}%`}} transition={{delay:0.3+i*0.08,duration:0.6}} style={{height:'100%',background:i===0?C.gold:i<3?C.green:C.blue,borderRadius:99}} />
+                  </div>
+                  <div style={{display:'flex',gap:'1rem',marginTop:'0.2rem'}}>
+                    <span style={{fontSize:10,color:C.muted}}>QF {s.qfPct}%</span>
+                    <span style={{fontSize:10,color:C.muted}}>SF {s.sfPct}%</span>
+                    <span style={{fontSize:10,color:C.muted}}>Final {s.finalPct}%</span>
                   </div>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Championship Contenders + Goals by Nation */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Contenders */}
-        <Card className="border-border/60">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base tracking-widest flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-primary" />
-              Championship Contenders
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2.5">
-            {top8Sim.map((s, i) => (
-              <div key={s.team} className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{s.flag}</span>
-                  <span className="text-xs font-medium text-foreground flex-1">{s.team}</span>
-                  <span className="text-xs font-bold text-primary font-display">{s.winPct.toFixed(1)}%</span>
-                </div>
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(s.winPct / maxWinPct) * 100}%` }}
-                    transition={{ duration: 0.9, delay: i * 0.07, ease: "easeOut" }}
-                    className="h-full rounded-full"
-                    style={{ background: i === 0 ? GOLD : i === 1 ? '#a78bfa' : i === 2 ? '#60a5fa' : 'hsl(220 25% 35%)' }}
-                  />
-                </div>
-              </div>
+              </motion.div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Goals by Nation */}
-        <Card className="border-border/60">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-display text-base tracking-widest flex items-center gap-2">
-              <Target className="w-4 h-4 text-primary" />
-              Goals by Nation (Top 10)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={230}>
-              <BarChart data={goalsByTeam} layout="vertical" margin={{ left: 0, right: 20, top: 0, bottom: 0 }}>
-                <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis dataKey="name" type="category" tick={{ fill: '#d1d5db', fontSize: 10 }} axisLine={false} tickLine={false} width={80} />
-                <Tooltip
-                  contentStyle={{ background: 'hsl(220 25% 14%)', border: '1px solid hsl(220 20% 22%)', borderRadius: 6 }}
-                  formatter={(v: number) => [v, 'Goals']}
-                  labelStyle={{ color: '#d1d5db' }}
-                />
-                <Bar dataKey="goals" radius={[0, 4, 4, 0]}>
-                  {goalsByTeam.map((_, i) => (
-                    <Cell key={i} fill={i === 0 ? GOLD : i < 3 ? '#60a5fa' : 'hsl(220 25% 28%)'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Results + Upcoming */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-border/60">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base tracking-widest flex items-center gap-2">
-              <Activity className="w-4 h-4 text-primary" />
-              Recent Results
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {playedMatches.slice(-6).reverse().map(m => {
-              const home = TEAMS.find(t => t.id === m.home);
-              const away = TEAMS.find(t => t.id === m.away);
-              const homeWon = (m.homeGoals ?? 0) > (m.awayGoals ?? 0);
-              const awayWon = (m.awayGoals ?? 0) > (m.homeGoals ?? 0);
-              return (
-                <div key={m.id} className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-                  <Badge variant="outline" className="text-[9px] border-border/50 text-muted-foreground px-1.5 py-0.5">GRP {m.group}</Badge>
-                  <span className={`text-sm ${homeWon ? 'opacity-100' : 'opacity-50'}`}>{home?.flagEmoji}</span>
-                  <span className={`text-xs font-medium flex-1 truncate ${homeWon ? 'text-foreground' : 'text-muted-foreground'}`}>{home?.name}</span>
-                  <div className="px-2.5 py-1 bg-card rounded font-display font-bold text-sm text-primary tabular-nums">
-                    {m.homeGoals}–{m.awayGoals}
-                  </div>
-                  <span className={`text-xs font-medium flex-1 text-right truncate ${awayWon ? 'text-foreground' : 'text-muted-foreground'}`}>{away?.name}</span>
-                  <span className={`text-sm ${awayWon ? 'opacity-100' : 'opacity-50'}`}>{away?.flagEmoji}</span>
+        {/* Award Predictions */}
+        <div style={{marginBottom:'1.5rem'}}>
+          <div style={{fontSize:13,fontWeight:700,color:C.muted,textTransform:'uppercase',letterSpacing:1,marginBottom:'0.75rem'}}>🏅 Award Predictions</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.75rem'}}>
+            {AWARDS.map((a,i)=>(
+              <motion.div key={a.title} custom={i+8} variants={fade} initial="hidden" animate="visible" style={{background:C.surface,border:`1px solid ${a.color}30`,borderRadius:10,padding:'1rem',position:'relative',overflow:'hidden'}}>
+                <div style={{position:'absolute',top:0,left:0,right:0,height:2,background:a.color,opacity:0.6}} />
+                <div style={{fontSize:22,marginBottom:'0.4rem'}}>{a.icon}</div>
+                <div style={{fontSize:10,color:a.color,fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:'0.25rem'}}>{a.title}</div>
+                <div style={{fontSize:15,fontWeight:700,marginBottom:'0.1rem'}}>{a.player}</div>
+                <div style={{fontSize:12,color:C.muted,marginBottom:'0.5rem'}}>{a.flag} {a.team}</div>
+                <div style={{background:`${a.color}18`,borderRadius:6,padding:'0.3rem 0.5rem',display:'inline-block'}}>
+                  <span style={{fontSize:13,fontWeight:700,color:a.color}}>{a.stat}</span>
                 </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+                <div style={{fontSize:10,color:C.muted,marginTop:'0.25rem'}}>{a.sub}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
-        <Card className="border-border/60">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base tracking-widest flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              Upcoming Fixtures
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {upcomingMatches.slice(0, 6).map(m => {
-              const home = TEAMS.find(t => t.id === m.home);
-              const away = TEAMS.find(t => t.id === m.away);
-              const date = new Date(m.date);
-              return (
-                <div key={m.id} className="flex items-center gap-2 p-2.5 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-                  <Badge variant="outline" className="text-[9px] border-border/50 text-muted-foreground px-1.5 py-0.5">GRP {m.group}</Badge>
-                  <span className="text-sm">{home?.flagEmoji}</span>
-                  <span className="text-xs font-medium text-foreground flex-1 truncate">{home?.name}</span>
-                  <div className="px-2 py-0.5 bg-primary/10 rounded text-[10px] font-medium text-primary whitespace-nowrap">
-                    {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+        {/* Dark Horses */}
+        <div style={{marginBottom:'1.5rem'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.75rem'}}>
+            <AlertTriangle size={14} color={C.orange} />
+            <span style={{fontSize:13,fontWeight:700,color:C.muted,textTransform:'uppercase',letterSpacing:1}}>Dark Horse Alert</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'0.75rem'}}>
+            {DARK_HORSES.map((d,i)=>(
+              <motion.div key={d.team} custom={i+12} variants={fade} initial="hidden" animate="visible" style={{background:C.surface,border:`1px solid ${C.orange}30`,borderRadius:10,padding:'1rem'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.5rem'}}>
+                  <span style={{fontSize:24}}>{d.flag}</span>
+                  <div>
+                    <div style={{fontSize:14,fontWeight:700}}>{d.team}</div>
+                    <div style={{fontSize:11,color:C.muted}}>R16: {d.r16Pct}% · QF: {d.qfPct}%</div>
                   </div>
-                  <span className="text-xs font-medium text-foreground flex-1 text-right truncate">{away?.name}</span>
-                  <span className="text-sm">{away?.flagEmoji}</span>
                 </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+                <div style={{fontSize:11,color:C.muted,lineHeight:1.5}}>{d.reason}</div>
+                <div style={{marginTop:'0.5rem',background:`${C.orange}18`,borderRadius:5,padding:'0.25rem 0.5rem',display:'inline-block'}}>
+                  <span style={{fontSize:11,fontWeight:700,color:C.orange}}>QF {d.qfPct}%</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Navigation Cards */}
+        <div style={{marginBottom:'1rem'}}>
+          <div style={{fontSize:13,fontWeight:700,color:C.muted,textTransform:'uppercase',letterSpacing:1,marginBottom:'0.75rem'}}>🧭 Explore</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'0.75rem'}}>
+            {QUICK_NAV.map(({href,icon:Icon,label,sub,color},i)=>(
+              <motion.div key={href} custom={i+16} variants={fade} initial="hidden" animate="visible">
+                <Link href={href} style={{display:'block',textDecoration:'none'}}>
+                  <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:10,padding:'1rem 1.25rem',display:'flex',alignItems:'center',gap:'0.75rem',cursor:'pointer',transition:'border-color 0.15s',}} onMouseEnter={e=>(e.currentTarget.style.borderColor=color)} onMouseLeave={e=>(e.currentTarget.style.borderColor=C.border)}>
+                    <div style={{width:36,height:36,borderRadius:8,background:`${color}18`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                      <Icon size={16} color={color} />
+                    </div>
+                    <div>
+                      <div style={{fontSize:14,fontWeight:700,color:C.text}}>{label}</div>
+                      <div style={{fontSize:12,color:C.muted}}>{sub}</div>
+                    </div>
+                    <TrendingUp size={14} color={C.muted} style={{marginLeft:'auto'}} />
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );

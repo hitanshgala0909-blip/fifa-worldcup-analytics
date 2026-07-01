@@ -1,0 +1,375 @@
+I am building a FIFA World Cup 2026 AI Analytics Platform. Here is everything you need to know before making any changes.
+
+═══════════════════════════════════════════════════════════════
+PROJECT CONTEXT
+═══════════════════════════════════════════════════════════════
+
+This is a full-stack sports analytics dashboard for the FIFA World Cup 2026.
+The backend is a Python ML pipeline. The frontend is what you are building/fixing now.
+
+The site URL is the current Replit deployment.
+The tournament is LIVE — group stage is underway as of June/July 2026.
+
+═══════════════════════════════════════════════════════════════
+WHAT THE BACKEND PRODUCES (data available to the frontend)
+═══════════════════════════════════════════════════════════════
+
+All of these CSVs / JSONs are available and should be consumed by the frontend:
+
+MATCH DATA:
+- group_stage_predictions_calibrated.csv
+  Columns: group, matchday, date, team_a, team_b, elo_a, elo_b, elo_gap,
+           p_a_win, p_draw, p_b_win, predicted_winner, confidence, upset_probability
+
+- official_r32_bracket_predictions.csv
+  Columns: round, match_num, bracket_side, team_a, team_b,
+           elo_a, elo_b, elo_gap, p_a_win, p_draw, p_b_win,
+           predicted_winner, confidence, upset_prob
+
+SIMULATION DATA:
+- wc2026_simulation_v3_calibrated.csv
+  Columns: sim_rank, team, p_group_stage, p_r32, p_r16, p_qf, p_sf,
+           p_runner_up, p_winner, reach_r16_pct, reach_qf_pct,
+           reach_sf_pct, reach_runner_up_pct
+
+PLAYER DATA:
+- performance_scores_all_1248.csv  (1,248 players)
+  Key columns: overall_rank, player, team, group, position, club, age,
+               performance_tier, tournament_projection, pos_fantasy_score,
+               captain_score, value_score, breakout_score, underrated_score,
+               overall_index, form_score, xG_/90, xA_/90,
+               expected_wc_goals, expected_wc_assists, expected_wc_contrib,
+               fitness, injury_risk, starter_prob, wc_matches,
+               clean_sheet_prob, team_r16_prob, team_power_rank
+
+AWARD PREDICTIONS:
+- award_golden_boot.csv     → golden_boot_score, xG_/90, expected_wc_goals
+- award_golden_ball.csv     → golden_ball_score, tournament_projection
+- award_golden_glove.csv    → golden_glove_score, clean_sheet_prob
+- award_best_young_player.csv → young_player_score, age
+
+FANTASY OUTPUTS:
+- fantasy_captain.csv       → captain_score, injury_risk, starter_prob
+- fantasy_vice_captain.csv
+- fantasy_budget.csv        → value picks from lower-ranked teams
+- fantasy_differential.csv  → low-ownership, high-upside picks
+- fantasy_best_xi.csv       → 4-3-3 formation, max 2 per team
+
+INTELLIGENCE REPORTS:
+- breakout_predictions.csv  → breakout_score, reasoning (text column)
+- underrated_predictions.csv → underrated_score, reasoning (text column)
+- explainability_top20.csv  → player, feature_label, shap_value, direction
+
+POWER RANKINGS:
+- wc2026_power_rankings.csv → power_rank, team, group, power_score, elo,
+                               squad_index, team_xg, avg_form
+
+═══════════════════════════════════════════════════════════════
+OFFICIAL R32 BRACKET DRAWS (hardcode these exactly)
+═══════════════════════════════════════════════════════════════
+
+Match 49:  Ecuador        vs Scotland
+Match 50:  France         vs Paraguay
+Match 51:  South Korea    vs Canada
+Match 52:  Netherlands    vs Morocco
+Match 53:  Portugal       vs Croatia
+Match 54:  Spain          vs Algeria
+Match 55:  Turkey         vs Senegal
+Match 56:  Belgium        vs Austria
+Match 57:  Brazil         vs Japan
+Match 58:  Germany        vs Norway
+Match 59:  Mexico         vs Ivory Coast
+Match 60:  England        vs Uzbekistan
+Match 61:  Argentina      vs Uruguay
+Match 62:  Australia      vs Iran
+Match 63:  Switzerland    vs Egypt
+Match 64:  Colombia       vs Paraguay
+
+PREDICTED R16 WINNERS (from simulation):
+M65: Brazil beats Ecuador
+M66: France beats Australia
+M67: South Korea beats Senegal
+M68: Argentina beats Morocco
+M69: Portugal beats Switzerland
+M70: Spain beats Colombia
+M71: England beats Belgium
+M72: Germany beats Mexico
+
+PREDICTED QUARTER-FINALS:
+M73: France beats Brazil
+M74: Argentina beats South Korea
+M75: Spain beats Portugal
+M76: England beats Germany
+
+PREDICTED SEMI-FINALS:
+M77: Argentina beats France
+M78: Spain beats England
+
+PREDICTED FINAL:
+M79: Argentina vs Spain → Argentina wins (41.2% vs 41.1%)
+
+═══════════════════════════════════════════════════════════════
+KEY MODEL PREDICTIONS (hardcode as fallback if CSV not loading)
+═══════════════════════════════════════════════════════════════
+
+TOURNAMENT WINNER:   Argentina (41.2% in final, 13.6% overall sim)
+RUNNER-UP:           Spain
+GOLDEN BOOT:         Marcus Thuram (France)
+GOLDEN BALL:         Kylian Mbappe (France)
+GOLDEN GLOVE:        Mike Maignan (France)
+BEST YOUNG PLAYER:   Lamine Yamal (Spain, age 18)
+TOP BREAKOUT:        Lamine Yamal (score 92.7)
+TOP UNDERRATED:      Kevin Pina (Cape Verde, MF)
+CAPTAIN PICK #1:     Bruno Fernandes (Portugal, score 94.8)
+BUDGET PICK:         Jonathan David (Canada, xG/90=0.664)
+DIFFERENTIAL:        Brahim Diaz (Morocco, projection 73.8)
+
+BEST XI (4-3-3):
+GK:  Mike Maignan (France)
+RB:  Marc Cucurella (Spain)
+CB:  Theo Hernandez (France)
+CB:  Achraf Hakimi (Morocco)
+LB:  Josko Gvardiol (Croatia)
+CM:  Rodri (Spain)
+CM:  Pedri (Spain)
+CM:  Jude Bellingham (England)
+RW:  Kylian Mbappe (France)
+LW:  Lamine Yamal (Spain)
+ST:  Marcus Thuram (France)
+
+═══════════════════════════════════════════════════════════════
+PAGES TO BUILD / FIX
+═══════════════════════════════════════════════════════════════
+
+Build or fix the following pages. Each page must be fully functional,
+connected to real data, and mobile responsive.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE 1: HOME / DASHBOARD  (route: /)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Header with site name "WC 2026 Intelligence" and navigation
+- Tournament status banner: "GROUP STAGE UNDERWAY — June/July 2026"
+- Last updated timestamp (auto-generated, show current date)
+- Hero section: predicted champion card (Argentina, 13.6% win probability)
+- Quick stats row: 48 teams | 1,248 players | 10,000 simulations | 31 matches predicted
+- Award predictions panel (4 cards side by side):
+    Golden Boot:       Marcus Thuram
+    Golden Ball:       Kylian Mbappe
+    Golden Glove:      Mike Maignan
+    Best Young Player: Lamine Yamal
+- Top 5 teams by win probability (from simulation CSV)
+- Dark horse alert: Japan (27% QF), Ecuador (27% QF), Morocco (26% QF)
+- Navigation cards to other pages
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE 2: BRACKET  (route: /bracket)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Show the OFFICIAL R32 draws (hardcoded above) with predicted probabilities
+- Visual bracket tree: R32 → R16 → QF → SF → Final
+- Each match card shows:
+    Team A  |  p(A wins)  |  Draw%  |  p(B wins)  |  Team B
+    Predicted winner highlighted in green
+    Confidence badge (color coded: green≥60%, amber 50-59%, red<40%)
+    UPSET label if lower-ELO team is predicted to win
+- Round tabs: All | R32 | R16 | QF | SF | Final
+- Match status: UPCOMING / LIVE / FT [score if known]
+- On mobile: show as vertical list, not horizontal tree
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE 3: TEAMS  (route: /teams)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Power rankings table (all 48 teams) from wc2026_power_rankings.csv
+- Columns: Rank | Team | Group | Power Score | ELO | Squad Index | xG | Form | Win%
+- Colour-coded tier badges:
+    ⚡ Elite (score ≥70)
+    🔵 Contender (≥55)
+    🟡 Competitive (≥40)
+    🟤 Underdog (<40)
+- Simulation probabilities column: Win% | SF% | QF% from simulation CSV
+- Click a team → team detail modal/page showing:
+    Group fixtures and predictions
+    Squad strength metrics
+    Likely tournament path
+    Key players (top 3 by tournament_projection)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE 4: PLAYERS  (route: /players)   ← THIS PAGE ALREADY EXISTS, FIX IT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This page exists but is outdated. Replace its content entirely.
+
+- Load from performance_scores_all_1248.csv
+- Default view: top 100 overall ranked by tournament_projection
+- Position filter tabs: ALL | GK | DF | MF | FW
+- Search bar: filter by player name or team name
+- Sort options: Projection | Fantasy Score | xG/90 | Form | Age
+- Each player card/row shows:
+    Rank | Player | Team | Position | Age
+    Tournament Projection (0-100 bar)
+    Performance Tier badge (⚡Elite / 🌟World Class / ✅Quality / 🔵Average / ⚪Squad)
+    xG/90 | Form Score | Fitness%
+    Injury Risk badge: 🟢 Safe (<20) | 🟡 Watch (20-40) | 🔴 Risk (>40)
+    Expected WC Goals | Expected WC Assists
+    Starter Probability
+- Click player → player detail panel:
+    Full stats breakdown
+    SHAP explanation: "Model rates this player highly because..."
+    Key strengths (top 3 positive SHAP features)
+    Key weaknesses (top 3 negative SHAP features)
+    Fantasy recommendation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE 5: FANTASY  (route: /fantasy)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Section 1: Best XI — show the 4-3-3 pitch visual with the 11 players above
+- Section 2: Captain Picks — top 10 from fantasy_captain.csv
+    Show: Captain Score | Risk badge | xG/90 | Expected Goals
+    Highlight #1 pick: Bruno Fernandes
+- Section 3: Vice-Captain — top 5 from fantasy_vice_captain.csv
+- Section 4: Budget Picks — from fantasy_budget.csv
+    Label: "High output, lower-ranked team — likely underpriced"
+    Show team power rank next to each pick
+- Section 5: Differentials — from fantasy_differential.csv
+    Label: "Low ownership, high upside"
+    Show R16 probability next to each pick
+- Section 6: Award Predictions panel (same as homepage)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE 6: INTELLIGENCE  (route: /intelligence)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Section 1: Breakout Players (from breakout_predictions.csv)
+    Show reasoning column as a callout card under each player
+    Highlight Lamine Yamal as #1
+- Section 2: Underrated Players (from underrated_predictions.csv)
+    Show reasoning column
+    Highlight Kevin Pina (Cape Verde) as the headline underrated pick
+- Section 3: Dark Horses (from simulation — teams with QF%>15 but win%<5)
+    Japan | Ecuador | Morocco | Senegal
+- Section 4: Simulation insights
+    Most likely finalist pair: Argentina vs Spain
+    Most open QF: England vs Germany (46% vs 35%)
+    Biggest upset in R32: Morocco over Netherlands
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAGE 7: GROUPS  (route: /groups)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- 12 group cards (A through L) in a 3x4 or 4x3 grid
+- Each group card shows the 4 teams with their power rank and ELO
+- Click a group → expand to show:
+    All 3 matchday fixtures with predicted probabilities
+    Predicted group standings (by expected points)
+    Teams predicted to qualify (1st and 2nd highlighted)
+    Most likely 3rd place team (with % chance of qualifying as best 3rd)
+
+GROUP COMPOSITIONS (hardcode these):
+Group A: Mexico, Czechia, South Korea, South Africa
+Group B: Switzerland, Qatar, Canada, Bosnia and Herzegovina
+Group C: Brazil, Morocco, Scotland, Haiti
+Group D: Turkey, Australia, United States, Paraguay
+Group E: Germany, Ivory Coast, Ecuador, Curacao
+Group F: Netherlands, Sweden, Japan, Tunisia
+Group G: Iran, Belgium, Egypt, New Zealand
+Group H: Spain, Uruguay, Saudi Arabia, Cape Verde
+Group I: France, Norway, Senegal, Iraq
+Group J: Algeria, Austria, Argentina, Jordan
+Group K: Portugal, Colombia, DR Congo, Uzbekistan
+Group L: Croatia, Panama, England, Ghana
+
+═══════════════════════════════════════════════════════════════
+DESIGN REQUIREMENTS
+═══════════════════════════════════════════════════════════════
+
+Colour scheme (dark theme):
+  Background:    #0d1117
+  Surface:       #161b22
+  Border:        #30363d
+  Text:          #e6edf3
+  Muted text:    #8b949e
+  Gold:          #F4C430
+  Green:         #3fb950
+  Blue:          #58a6ff
+  Orange:        #f97316
+  Red:           #f85149
+
+Typography: Clean sans-serif (Inter or system-ui)
+
+Navigation: Top navbar with links to all 7 pages.
+            Mobile: hamburger menu or bottom nav bar.
+
+Cards: Rounded corners, subtle border, dark surface background.
+
+Status indicators:
+  UPCOMING: blue badge
+  LIVE: pulsing red badge
+  FT: grey badge with score
+
+Performance tier badges (colour coded):
+  ⚡ Elite:       gold background
+  🌟 World Class: blue background
+  ✅ Quality:     green background
+  🔵 Average:     grey background
+  ⚪ Squad:       dark grey background
+
+Injury risk badges:
+  Safe (<20):    green dot
+  Watch (20-40): amber dot
+  Risk (>40):    red dot
+
+═══════════════════════════════════════════════════════════════
+META TAGS (add to every page)
+═══════════════════════════════════════════════════════════════
+
+<title>WC 2026 Intelligence — AI Football Analytics</title>
+<meta name="description" content="AI-powered FIFA World Cup 2026 predictions — match outcomes, player analytics, bracket forecasts, and fantasy picks for all 48 teams and 1,248 players." />
+<meta property="og:title" content="WC 2026 Intelligence Platform" />
+<meta property="og:description" content="ML-driven predictions for the 2026 FIFA World Cup. Match probabilities, player performance scores, tournament simulation, and fantasy recommendations." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary_large_image" />
+
+═══════════════════════════════════════════════════════════════
+OTHER REQUIREMENTS
+═══════════════════════════════════════════════════════════════
+
+1. LAST UPDATED TIMESTAMP
+   Show "Data last updated: [date]" in the footer and on the players page header.
+   Hardcode today's date if dynamic refresh is not set up yet.
+
+2. MATCH STATUS BADGES
+   For all match predictions, show a status badge:
+   - UPCOMING (blue) if match has not been played yet
+   - LIVE (red, pulsing) if match is today
+   - FT [score] (grey) if result is known
+   Hardcode status as UPCOMING for all matches if live API not connected.
+
+3. MOBILE RESPONSIVE
+   Every page must work on a phone screen.
+   Tables must scroll horizontally.
+   Remove any maximum-scale=1 from viewport meta — allow pinch-zoom.
+   Bracket tree collapses to vertical card list on mobile.
+
+4. LOADING STATES
+   Show a loading spinner or skeleton cards while CSV data loads.
+   Show a friendly error message if data fails to load — not a blank page.
+
+5. SEARCH AND FILTER
+   Players page must have a working search bar (filter by name or team).
+   Position filter tabs must work (GK / DF / MF / FW).
+
+6. NO EXTERNAL API REQUIRED
+   All data comes from the CSV files listed above.
+   Do not make the site dependent on an external football API.
+   The CSVs are the source of truth.
+
+7. FOOTER
+   "WC 2026 Intelligence | Built with Python ML + React | Data: ELO ratings, squad analytics, 10,000-run Monte Carlo simulation"
+   "Predictions are model outputs, not guarantees."
+
+═══════════════════════════════════════════════════════════════
+DO NOT DO
+═══════════════════════════════════════════════════════════════
+
+- Do NOT use placeholder data or lorem ipsum anywhere
+- Do NOT leave the Replit default meta description
+- Do NOT break any existing functionality that already works
+- Do NOT use maximum-scale=1 in the viewport tag
+- Do NOT show a blank page if data fails to load
+- Do NOT hardcode team names with typos (Algeria not "algerua", Uzbekistan not "uxbekistan", Colombia not "columbia")

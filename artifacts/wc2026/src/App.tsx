@@ -4,11 +4,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout/Layout";
 import Home from "@/pages/Home";
-import Predictor from "@/pages/Predictor";
-import Simulator from "@/pages/Simulator";
+import Bracket from "@/pages/Bracket";
 import Teams from "@/pages/Teams";
 import Players from "@/pages/Players";
 import Fantasy from "@/pages/Fantasy";
+import Intelligence from "@/pages/Intelligence";
+import Groups from "@/pages/Groups";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
@@ -18,11 +19,12 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Home} />
-        <Route path="/predictor" component={Predictor} />
-        <Route path="/simulator" component={Simulator} />
+        <Route path="/bracket" component={Bracket} />
         <Route path="/teams" component={Teams} />
         <Route path="/players" component={Players} />
         <Route path="/fantasy" component={Fantasy} />
+        <Route path="/intelligence" component={Intelligence} />
+        <Route path="/groups" component={Groups} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

@@ -66,7 +66,7 @@ export const TEAMS: Team[] = [
   { id:'IRQ', name:'Iraq',          group:'I', code:'IRQ', flagEmoji:'🇮🇶', confederation:'AFC',      eloRating:1640, worldRank:75,  projectedPoints:0, form:'LLLDD', simWinPct:0.1 },
   // Group J
   { id:'ARG', name:'Argentina',     group:'J', code:'ARG', flagEmoji:'🇦🇷', confederation:'CONMEBOL', eloRating:2080, worldRank:2,   projectedPoints:9, form:'WWLWW', simWinPct:14.1 },
-  { id:'NGA', name:'Nigeria',       group:'J', code:'NGA', flagEmoji:'🇳🇬', confederation:'CAF',      eloRating:1760, worldRank:35,  projectedPoints:5, form:'WWDDL', simWinPct:1.2 },
+  { id:'AUT', name:'Austria',        group:'J', code:'AUT', flagEmoji:'🇦🇹', confederation:'UEFA',     eloRating:1810, worldRank:25,  projectedPoints:5, form:'WWLWW', simWinPct:1.4 },
   { id:'ALG', name:'Algeria',       group:'J', code:'ALG', flagEmoji:'🇩🇿', confederation:'CAF',      eloRating:1720, worldRank:52,  projectedPoints:3, form:'WDLLL', simWinPct:0.2 },
   { id:'JOR', name:'Jordan',        group:'J', code:'JOR', flagEmoji:'🇯🇴', confederation:'AFC',      eloRating:1670, worldRank:67,  projectedPoints:0, form:'LLLLL', simWinPct:0.1 },
   // Group K
@@ -506,7 +506,7 @@ const SQUADS: Record<string, { country: string; defs: PD[] }> = {
     ['Mattéo Guendouzi','CM',26,80,1,2,'Lazio'],['Kingsley Coman','RW',29,82,2,3,'Bayern Munich'],
   ]},
   NOR: { country: 'Norway', defs: [
-    ['Ørjan Nyland','GK',34,78,0,0,'Brentford'],['Rune Jarstein','GK',40,73,0,0,'Hertha BSC'],['Morten Thorsby','GK',28,72,0,0,'Genoa'],
+    ['Ørjan Nyland','GK',34,78,0,0,'Brentford'],['Rune Jarstein','GK',40,73,0,0,'Hertha BSC'],['Oscar Linnér','GK',29,72,0,0,'RC Strasbourg'],
     ['Vegar Eggen Hedenstad','RB',28,76,0,1,'Borussia Dortmund'],['Julian Ryerson','RB',26,76,0,1,'Borussia Dortmund'],
     ['Andrew Hjelde','LB',22,73,0,1,'Nottingham Forest'],['Birger Meling','LB',30,74,0,1,'Rennes'],
     ['Kristoffer Ajer','CB',27,80,0,0,'Brentford'],['Leo Skiri Østigård','CB',25,77,0,0,'Napoli'],['Stefan Strandberg','CB',33,75,0,0,'Rubin Kazan'],['Andreas Hanche-Olsen','CB',26,74,0,0,'Mainz'],
@@ -554,16 +554,17 @@ const SQUADS: Record<string, { country: string; defs: PD[] }> = {
     ['Lautaro Martínez','ST',27,90,6,3,'Inter Milan'],['Julián Álvarez','ST',25,88,4,2,'Atletico Madrid'],['Adolfo Gaich','ST',25,74,1,0,'CSKA Moscow'],
     ['Nicolás González','LW',27,79,2,2,'Juventus'],['Thiago Almada','AM',23,77,1,2,'Botafogo'],
   ]},
-  NGA: { country: 'Nigeria', defs: [
-    ['Maduka Okoye','GK',25,78,0,0,'Udinese'],['Francis Uzoho','GK',28,77,0,0,'Omonia'],['John Noble','GK',29,73,0,0,'Ifeanyi Ubah'],
-    ['Ola Aina','RB',28,79,0,2,'Nottingham Forest'],['Saud Abdulhamid','RB',24,77,0,1,'AS Roma'],
-    ['Zaidu Sanusi','LB',27,77,0,1,'Porto'],['Calvin Bassey','LB',25,79,0,0,'Fulham'],
-    ['William Troost-Ekong','CB',31,79,1,0,'Watford'],['Leon Balogun','CB',37,75,0,0,'Rangers'],['Kenneth Omeruo','CB',32,74,0,0,'Kasimpasa'],['Chidozie Awaziem','CB',28,74,0,0,'Alanyaspor'],
-    ['Wilfred Ndidi','DM',28,82,1,1,'Leicester City'],['Frank Onyeka','CM',27,76,0,1,'Augsburg'],
-    ['Joe Aribo','CM',28,77,1,2,'Southampton'],['Alex Iwobi','AM',29,80,2,3,'Fulham'],
-    ['Samuel Chukwueze','RW',26,80,2,2,'AC Milan'],['Moses Simon','LW',29,78,1,2,'Nantes'],
-    ['Victor Osimhen','ST',27,88,2,0,'Galatasaray'],['Terem Moffi','ST',26,79,2,1,'Nice'],['Taiwo Awoniyi','ST',27,78,1,0,'Nottingham Forest'],
-    ['Emmanuel Dennis','RW',27,77,1,1,'Nottingham Forest'],['Fisayo Dele-Bashiru','CM',24,76,1,1,'Lazio'],['Kelechi Iheanacho','ST',28,77,1,1,'Sevilla'],
+  AUT: { country: 'Austria', defs: [
+    ['Patrick Pentz','GK',28,79,0,0,'Bayer Leverkusen'],['Alexander Schlager','GK',31,75,0,0,'LASK'],['Heinz Lindner','GK',35,73,0,0,'FC Basel'],
+    ['Stefan Lainer','RB',32,77,0,2,'Borussia M\'gladbach'],['Phillipp Mwene','RB',32,73,0,1,'Mainz'],
+    ['Marco Friedl','LB',27,76,0,2,'Werder Bremen'],['Philipp Lienhart','CB',29,77,0,0,'SC Freiburg'],
+    ['Kevin Danso','CB',25,80,0,0,'RC Lens'],['Maximilian Wöber','CB',26,78,0,0,'Borussia M\'gladbach'],['Gernot Trauner','CB',32,77,0,0,'Feyenoord'],['Flavius Daniliuc','CB',23,74,0,0,'Nice'],
+    ['Florian Grillitsch','DM',29,76,0,1,'Hoffenheim'],['Nicolas Seiwald','CM',23,79,1,2,'RB Leipzig'],
+    ['Konrad Laimer','CM',27,82,1,3,'Bayern Munich'],['Marcel Sabitzer','CM',30,81,2,3,'Borussia Dortmund'],
+    ['Xaver Schlager','CM',27,80,1,2,'RB Leipzig'],['Romano Schmid','CM',24,76,1,2,'Werder Bremen'],
+    ['Christoph Baumgartner','AM',25,80,2,3,'RB Leipzig'],['Patrick Wimmer','LW',24,75,1,2,'Wolfsburg'],
+    ['Michael Gregoritsch','ST',30,78,3,1,'SC Freiburg'],['Marko Arnautovic','ST',35,76,2,1,'Inter Milan'],
+    ['Sasa Kalajdzic','ST',27,76,2,1,'Eintracht Frankfurt'],['Andreas Weimann','RW',32,73,1,1,'West Bromwich Albion'],
   ]},
   ALG: { country: 'Algeria', defs: [
     ['Raïs M\'Bolhi','GK',37,76,0,0,'Al Jazira'],['Alexandre Oukidja','GK',36,75,0,0,'Metz'],['Farid El Abed','GK',27,72,0,0,'USM Alger'],
@@ -759,11 +760,11 @@ export const MATCHES: Match[] = [
   { id:'mI6', group:'I', home:'IRQ', away:'FRA', date:'2026-06-27T01:00:00Z', venue:'NRG Stadium, Houston', homeGoals:null, awayGoals:null, homeProbWin:0.05, drawProb:0.10, awayProbWin:0.85 },
   // ── Group J: Argentina, Nigeria, Algeria, Jordan ──────────────────────────
   { id:'mJ1', group:'J', home:'ARG', away:'JOR', date:'2026-06-15T01:00:00Z', venue:'Hard Rock Stadium, Miami', homeGoals:3, awayGoals:0, homeProbWin:0.85, drawProb:0.10, awayProbWin:0.05 },
-  { id:'mJ2', group:'J', home:'NGA', away:'ALG', date:'2026-06-16T01:00:00Z', venue:'SoFi Stadium, Los Angeles', homeGoals:2, awayGoals:1, homeProbWin:0.45, drawProb:0.28, awayProbWin:0.27 },
-  { id:'mJ3', group:'J', home:'ARG', away:'NGA', date:'2026-06-21T19:00:00Z', venue:'MetLife Stadium, New York', homeGoals:1, awayGoals:0, homeProbWin:0.62, drawProb:0.22, awayProbWin:0.16 },
+  { id:'mJ2', group:'J', home:'AUT', away:'ALG', date:'2026-06-16T01:00:00Z', venue:'SoFi Stadium, Los Angeles', homeGoals:2, awayGoals:1, homeProbWin:0.48, drawProb:0.28, awayProbWin:0.24 },
+  { id:'mJ3', group:'J', home:'ARG', away:'AUT', date:'2026-06-21T19:00:00Z', venue:'MetLife Stadium, New York', homeGoals:1, awayGoals:0, homeProbWin:0.65, drawProb:0.20, awayProbWin:0.15 },
   { id:'mJ4', group:'J', home:'ALG', away:'JOR', date:'2026-06-22T01:00:00Z', venue:'Mercedes-Benz Stadium, Atlanta', homeGoals:2, awayGoals:0, homeProbWin:0.60, drawProb:0.22, awayProbWin:0.18 },
   { id:'mJ5', group:'J', home:'ALG', away:'ARG', date:'2026-06-27T19:00:00Z', venue:'SoFi Stadium, Los Angeles', homeGoals:null, awayGoals:null, homeProbWin:0.15, drawProb:0.20, awayProbWin:0.65 },
-  { id:'mJ6', group:'J', home:'JOR', away:'NGA', date:'2026-06-27T19:00:00Z', venue:'Hard Rock Stadium, Miami', homeGoals:null, awayGoals:null, homeProbWin:0.22, drawProb:0.28, awayProbWin:0.50 },
+  { id:'mJ6', group:'J', home:'JOR', away:'AUT', date:'2026-06-27T19:00:00Z', venue:'Hard Rock Stadium, Miami', homeGoals:null, awayGoals:null, homeProbWin:0.12, drawProb:0.20, awayProbWin:0.68 },
   // ── Group K: Portugal, Colombia, Uzbekistan, DR Congo ─────────────────────
   { id:'mK1', group:'K', home:'POR', away:'UZB', date:'2026-06-16T23:00:00Z', venue:'BC Place, Vancouver', homeGoals:3, awayGoals:0, homeProbWin:0.78, drawProb:0.14, awayProbWin:0.08 },
   { id:'mK2', group:'K', home:'COL', away:'COD', date:'2026-06-16T19:00:00Z', venue:'Saputo Stadium, Montreal', homeGoals:2, awayGoals:0, homeProbWin:0.65, drawProb:0.20, awayProbWin:0.15 },
@@ -798,6 +799,7 @@ export const SIMULATION: SimResult[] = [
   { team:'Japan',       flag:'🇯🇵', r16Pct:66, qfPct:26, sfPct:10, finalPct:3,  winPct:2.9 },
   { team:'Colombia',    flag:'🇨🇴', r16Pct:65, qfPct:24, sfPct:9,  finalPct:3,  winPct:2.0 },
   { team:'Mexico',      flag:'🇲🇽', r16Pct:62, qfPct:22, sfPct:8,  finalPct:3,  winPct:2.1 },
+  { team:'Austria',     flag:'🇦🇹', r16Pct:62, qfPct:20, sfPct:7,  finalPct:2,  winPct:1.4 },
   { team:'Senegal',     flag:'🇸🇳', r16Pct:58, qfPct:18, sfPct:6,  finalPct:2,  winPct:1.9 },
   { team:'South Korea', flag:'🇰🇷', r16Pct:55, qfPct:16, sfPct:5,  finalPct:2,  winPct:1.5 },
   { team:'Türkiye',     flag:'🇹🇷', r16Pct:52, qfPct:14, sfPct:5,  finalPct:2,  winPct:1.3 },
