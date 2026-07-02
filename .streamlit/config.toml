@@ -1,6 +1,4 @@
 [server]
-port = 5000
-headless = true
 enableCORS = false
 enableXsrfProtection = false
 
