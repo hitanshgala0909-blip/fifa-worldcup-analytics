@@ -73,51 +73,28 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Champion Prediction + Top 5 */}
-        <div style={{display:'grid',gridTemplateColumns:'340px 1fr',gap:'1rem',marginBottom:'1.5rem',alignItems:'start'}}>
-          {/* Champion Card */}
-          <motion.div initial={{opacity:0,scale:0.97}} animate={{opacity:1,scale:1}} transition={{delay:0.2}} style={{background:`linear-gradient(135deg,${C.surface},#1e2a1e)`,border:`1px solid ${C.gold}40`,borderRadius:12,padding:'1.5rem',textAlign:'center',position:'relative',overflow:'hidden'}}>
-            <div style={{position:'absolute',top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,transparent,${C.gold},transparent)`}} />
-            <div style={{fontSize:11,color:C.gold,fontWeight:700,letterSpacing:2,textTransform:'uppercase',marginBottom:'0.5rem'}}>🏆 Predicted Champion</div>
-            <div style={{fontSize:64,marginBottom:'0.5rem'}}>🇦🇷</div>
-            <div style={{fontSize:24,fontWeight:800,marginBottom:'0.25rem'}}>Argentina</div>
-            <div style={{fontSize:13,color:C.muted,marginBottom:'1rem'}}>2022 World Champions · Group J</div>
-            <div style={{background:`${C.gold}18`,border:`1px solid ${C.gold}40`,borderRadius:8,padding:'0.75rem'}}>
-              <div style={{fontSize:32,fontWeight:800,color:C.gold}}>14.1%</div>
-              <div style={{fontSize:12,color:C.muted}}>Win Probability</div>
-            </div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0.5rem',marginTop:'0.75rem'}}>
-              <div style={{background:'#ffffff08',borderRadius:6,padding:'0.4rem'}}>
-                <div style={{fontSize:16,fontWeight:700,color:C.text}}>94%</div>
-                <div style={{fontSize:10,color:C.muted}}>R16</div>
-              </div>
-              <div style={{background:'#ffffff08',borderRadius:6,padding:'0.4rem'}}>
-                <div style={{fontSize:16,fontWeight:700,color:C.text}}>72%</div>
-                <div style={{fontSize:10,color:C.muted}}>QF</div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Top 5 Win Probability */}
-          <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:12,padding:'1.25rem'}}>
-            <div style={{fontSize:13,fontWeight:700,color:C.muted,textTransform:'uppercase',letterSpacing:1,marginBottom:'1rem'}}>🎯 Top Win Probabilities</div>
+        {/* Top Win Probabilities — full width */}
+        <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:12,padding:'1.25rem',marginBottom:'1.5rem'}}>
+          <div style={{fontSize:13,fontWeight:700,color:C.muted,textTransform:'uppercase',letterSpacing:1,marginBottom:'1rem'}}>🎯 Top Win Probabilities</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:'0.5rem'}}>
             {top5.map((s,i)=>(
-              <motion.div key={s.team} custom={i+4} variants={fade} initial="hidden" animate="visible" style={{display:'flex',alignItems:'center',gap:'0.75rem',padding:'0.6rem 0',borderBottom:i<4?`1px solid ${C.border}40`:'none'}}>
-                <div style={{width:24,height:24,borderRadius:'50%',background:`${C.gold}18`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:700,color:C.gold,flexShrink:0}}>{i+1}</div>
-                <span style={{fontSize:20}}>{s.flag}</span>
-                <div style={{flex:1}}>
-                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.2rem'}}>
-                    <span style={{fontSize:14,fontWeight:600}}>{s.team}</span>
-                    <span style={{fontSize:14,fontWeight:700,color:C.gold}}>{s.winPct}%</span>
-                  </div>
-                  <div style={{height:5,background:'#ffffff12',borderRadius:99,overflow:'hidden'}}>
-                    <motion.div initial={{width:0}} animate={{width:`${(s.winPct/16)*100}%`}} transition={{delay:0.3+i*0.08,duration:0.6}} style={{height:'100%',background:i===0?C.gold:i<3?C.green:C.blue,borderRadius:99}} />
-                  </div>
-                  <div style={{display:'flex',gap:'1rem',marginTop:'0.2rem'}}>
-                    <span style={{fontSize:10,color:C.muted}}>QF {s.qfPct}%</span>
-                    <span style={{fontSize:10,color:C.muted}}>SF {s.sfPct}%</span>
-                    <span style={{fontSize:10,color:C.muted}}>Final {s.finalPct}%</span>
-                  </div>
+              <motion.div key={s.team} custom={i+4} variants={fade} initial="hidden" animate="visible"
+                style={{background:'#ffffff05',border:`1px solid ${C.border}40`,borderRadius:10,padding:'0.9rem 1rem'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'0.5rem',marginBottom:'0.6rem'}}>
+                  <div style={{width:22,height:22,borderRadius:'50%',background:`${C.gold}18`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:C.gold,flexShrink:0}}>{i+1}</div>
+                  <span style={{fontSize:22}}>{s.flag}</span>
+                  <span style={{fontSize:13,fontWeight:600,color:C.text}}>{s.team}</span>
+                </div>
+                <div style={{fontSize:28,fontWeight:800,color:i===0?C.gold:C.text,lineHeight:1}}>{s.winPct}%</div>
+                <div style={{fontSize:10,color:C.muted,marginBottom:'0.5rem'}}>Win Probability</div>
+                <div style={{height:4,background:'#ffffff12',borderRadius:99,overflow:'hidden',marginBottom:'0.5rem'}}>
+                  <motion.div initial={{width:0}} animate={{width:`${(s.winPct/16)*100}%`}} transition={{delay:0.3+i*0.08,duration:0.6}}
+                    style={{height:'100%',background:i===0?C.gold:i<3?C.green:C.blue,borderRadius:99}} />
+                </div>
+                <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
+                  <span style={{fontSize:10,color:C.muted}}>QF {s.qfPct}%</span>
+                  <span style={{fontSize:10,color:C.muted}}>SF {s.sfPct}%</span>
+                  <span style={{fontSize:10,color:C.muted}}>F {s.finalPct}%</span>
                 </div>
               </motion.div>
             ))}
